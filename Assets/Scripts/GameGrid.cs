@@ -41,10 +41,13 @@ public class GameGrid : MonoBehaviour {
             return MoveResult.ROTATING;
         }
 
-        bool changedSide = false;
-        GridCube next = SnakeHead().GetNextCube(direction, out changedSide);
-        if (next == null) {
-            return MoveResult.DIED;
+        GridCube next = SnakeHead().GetNextCube(direction, out var changedSide);
+
+        if (next == null)
+        {
+            next = FindSnakeBound(SnakeHead());
+            changedSide = false;
+            if (next == null) return MoveResult.ERROR;
         }
 
         if (next.IsSnake() || next.IsHole()) {
@@ -66,9 +69,26 @@ public class GameGrid : MonoBehaviour {
             last.SetCubeState(GridCube.CubeState.EMPTY);
             snake.RemoveLast();
             return MoveResult.MOVED;
-        } else {
-            return MoveResult.ATE;
         }
+
+        return MoveResult.ATE;
+    }
+
+    private GridCube FindSnakeBound(GridCube snake)
+    {
+        //Left side
+        if (snake.Line == 0)
+            return cubes.Find(c => c.Column == snake.Column && c.Line == gridSize - 1);
+        if (snake.Column == 0)
+            return cubes.Find(c => c.Line == snake.Line && c.Column == gridSize - 1);
+
+        //Right side
+        if (snake.Line == gridSize - 1)
+            return cubes.Find(c => c.Column == snake.Column && c.Line == 0);
+        if (snake.Column == gridSize - 1)
+            return cubes.Find(c => c.Line == snake.Line && c.Column == 0);
+        
+        return null;
     }
 
     private bool StartRotation(GridCube.Direction direction) {
@@ -119,7 +139,7 @@ public class GameGrid : MonoBehaviour {
         bool done = false;
         while (!done) {
             GridCube cube = cubes.ElementAt(Random.Range(0, cubes.Count));
-            if (!cube.isEmpty() || (cube.SameSideAs(SnakeHead()) && rotationEnabled)) {
+            if (!cube.IsEmpty() || (cube.SameSideAs(SnakeHead()) && rotationEnabled)) {
                 continue;
             }
 
@@ -128,7 +148,8 @@ public class GameGrid : MonoBehaviour {
         }
     }
 
-    public void SetupGrid(bool enableRotation, int appleCount) {
+    public void SetupGrid(bool enableRotation, int appleCount)
+    {
         if (cubes != null) {
             foreach (GridCube c in cubes) {
                 Destroy(c.gameObject);
@@ -196,6 +217,7 @@ public class GameGrid : MonoBehaviour {
                         cube.AddCubeSide(GridCube.CubeSide.BACK);
                     }
 
+                    cube.InitiateCube(i,j,k);
                     cubes.Add(cube);
                 }
             }

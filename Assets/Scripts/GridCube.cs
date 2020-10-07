@@ -1,11 +1,20 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
 
 public class GridCube : MonoBehaviour {
 
     private CubeState currentState = CubeState.EMPTY;
     public CubeSide cubeSide = 0;
+
+    public int Line { get; private set; }
+    public int Column { get; private set; }
+    public int Depth { get; private set; }
+    public void InitiateCube(int line, int column, int depth)
+    {
+        Line = line;
+        Column = column;
+        Depth = depth;
+    }
 
     [Flags]
     public enum CubeSide {
@@ -66,7 +75,7 @@ public class GridCube : MonoBehaviour {
         return currentState == CubeState.SNAKE;
     }
 
-    public bool isEmpty() {
+    public bool IsEmpty() {
         return currentState == CubeState.EMPTY;
     }
 
@@ -112,8 +121,4 @@ public class GridCube : MonoBehaviour {
         return null;
     }
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }
