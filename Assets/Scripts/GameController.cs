@@ -2,7 +2,8 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-public class GameController : MonoBehaviour {
+public class GameController : MonoBehaviour
+{
     private const float DEFAULT_INPUT_COOLDOWN = 0.2f;
     private const float COOLDOWN_STEP = 0.001f;
     private const float MIN_INPUT_COOLDOWN = 0.05f;
@@ -16,6 +17,8 @@ public class GameController : MonoBehaviour {
     private GameGrid.MoveResult lastResult;
     private float lastInputTime = 0;
     private int score = 0;
+    private float speedFactor = 0.1f;
+    private float speed = 1f;
     private bool playing = true;
     private bool rotationEnabled;
     private float inputCoolDown = DEFAULT_INPUT_COOLDOWN;
@@ -36,10 +39,10 @@ public class GameController : MonoBehaviour {
         SetupCamera();
     }
 
-    void Update() {
-        if (!playing) {
-            return;
-        }
+    void Update()
+    {
+        if (!playing) return;
+
 
         GridCube.Direction dir = ReadInput();
 
@@ -53,8 +56,9 @@ public class GameController : MonoBehaviour {
 
         lastDirection = dir;
 
-        lastInputTime += Time.deltaTime;
-        if (lastInputTime > inputCoolDown) {
+        lastInputTime += Time.deltaTime * speed;
+        if (lastInputTime > inputCoolDown)
+        {
             
             lastInputTime = 0;
 
@@ -87,7 +91,7 @@ public class GameController : MonoBehaviour {
                     }
 
                     //TODO: Win if no more space is available
-
+                    speed += speedFactor;
                     score++;                    
                     guiController.SetScore(score);
 
